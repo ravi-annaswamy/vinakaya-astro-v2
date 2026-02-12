@@ -157,6 +157,48 @@ function getCityInfo(cityName) {
       timezone: { hours: 5, minutes: 30, direction: 'E' },
       timezoneName: 'Asia/Kolkata',
       dst: false
+    },
+    'Dubai': {
+      latitude: { degrees: 25, minutes: 16, direction: 'N' },
+      longitude: { degrees: 55, minutes: 18, direction: 'E' },
+      timezone: { hours: 4, minutes: 0, direction: 'E' },
+      timezoneName: 'Asia/Dubai',
+      dst: false
+    },
+    'Cairo': {
+      latitude: { degrees: 30, minutes: 2, direction: 'N' },
+      longitude: { degrees: 31, minutes: 14, direction: 'E' },
+      timezone: { hours: 2, minutes: 0, direction: 'E' },
+      timezoneName: 'Africa/Cairo',
+      dst: true
+    },
+    'Melbourne': {
+      latitude: { degrees: 37, minutes: 49, direction: 'S' },
+      longitude: { degrees: 144, minutes: 58, direction: 'E' },
+      timezone: { hours: 10, minutes: 0, direction: 'E' },
+      timezoneName: 'Australia/Melbourne',
+      dst: true
+    },
+    'Sydney': {
+      latitude: { degrees: 33, minutes: 52, direction: 'S' },
+      longitude: { degrees: 151, minutes: 12, direction: 'E' },
+      timezone: { hours: 10, minutes: 0, direction: 'E' },
+      timezoneName: 'Australia/Sydney',
+      dst: true
+    },
+    'Karaikudi': {
+      latitude: { degrees: 10, minutes: 4, direction: 'N' },
+      longitude: { degrees: 78, minutes: 47, direction: 'E' },
+      timezone: { hours: 5, minutes: 30, direction: 'E' },
+      timezoneName: 'Asia/Kolkata',
+      dst: false
+    },
+    'Riyadh, Saudi Arabia': {
+      latitude: { degrees: 24, minutes: 43, direction: 'N' },
+      longitude: { degrees: 46, minutes: 43, direction: 'E' },
+      timezone: { hours: 3, minutes: 0, direction: 'E' },
+      timezoneName: 'Asia/Riyadh',
+      dst: false
     }
   };
 
@@ -185,7 +227,13 @@ const cityTamilNames = {
   'San Francisco, CA': 'சான் பிரான்சிஸ்கோ',
   'Chicago, IL': 'சிகாகோ',
   'Houston, TX': 'ஹூஸ்டன்',
-  'Phoenix, AZ': 'பீனிக்ஸ்'
+  'Phoenix, AZ': 'பீனிக்ஸ்',
+  'Dubai': 'துபாய்',
+  'Cairo': 'கெய்ரோ',
+  'Melbourne': 'மெல்போர்ன்',
+  'Sydney': 'சிட்னி',
+  'Karaikudi': 'காரைக்குடி',
+  'Riyadh, Saudi Arabia': 'ரியாத்'
 };
 
 
