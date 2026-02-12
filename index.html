@@ -605,14 +605,82 @@ function ensureExportDependencies() {
 }
 
 async function captureReportCanvas(scale = 3) {
-  const reportEl = document.getElementById('reportCanvas');
-  return html2canvas(reportEl, {
-    scale,
-    useCORS: true,
-    backgroundColor: '#ffffff',
-    logging: false,
-    ignoreElements: (el) => el.classList && el.classList.contains('no-export')
+  const source = document.getElementById('reportCanvas');
+  const host = document.createElement('div');
+  host.style.position = 'fixed';
+  host.style.left = '-20000px';
+  host.style.top = '0';
+  host.style.width = '1400px';
+  host.style.background = '#ffffff';
+  host.style.zIndex = '-1';
+
+  const clone = source.cloneNode(true);
+  clone.removeAttribute('id');
+  clone.style.width = '1400px';
+  clone.style.maxWidth = '1400px';
+  clone.style.margin = '0';
+  clone.querySelectorAll('.no-export').forEach(el => el.remove());
+
+  const chartContainer = clone.querySelector('.chart-container');
+  if (chartContainer) {
+    chartContainer.style.display = 'grid';
+    chartContainer.style.gridTemplateColumns = '360px 360px 1fr';
+    chartContainer.style.gap = '10px';
+    chartContainer.style.alignItems = 'start';
+  }
+
+  const rasi = clone.querySelector('#chartContainer');
+  const amsa = clone.querySelector('#navamsaChartContainer');
+  if (rasi) {
+    rasi.style.minHeight = '360px';
+    rasi.style.width = '360px';
+  }
+  if (amsa) {
+    amsa.style.minHeight = '360px';
+    amsa.style.width = '360px';
+  }
+
+  clone.querySelectorAll('#chartContainer svg, #navamsaChartContainer svg').forEach(svg => {
+    svg.style.width = '100%';
+    svg.style.maxWidth = '360px';
+    svg.style.height = 'auto';
   });
+
+  const result = clone.querySelector('#result');
+  if (result) {
+    result.style.overflow = 'visible';
+    result.style.maxHeight = 'none';
+  }
+
+  clone.querySelectorAll('#result th, #result td, #dashasContainer th, #dashasContainer td').forEach(el => {
+    el.style.fontSize = '11px';
+    el.style.padding = '4px';
+  });
+
+  host.appendChild(clone);
+  document.body.appendChild(host);
+
+  try {
+    return await html2canvas(clone, {
+      scale,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      windowWidth: clone.scrollWidth,
+      windowHeight: clone.scrollHeight,
+      scrollX: 0,
+      scrollY: 0
+    });
+  } finally {
+    host.remove();
+  }
+}
+
+function downloadCanvasPng(canvas) {
+  const link = document.createElement('a');
+  link.href = canvas.toDataURL('image/png');
+  link.download = `vinayaka-v2-${getBirthStamp()}_${getCityForFilename()}.png`;
+  link.click();
 }
 
 async function copyReportToClipboard() {
@@ -622,12 +690,13 @@ async function copyReportToClipboard() {
       alert('Copy requires HTTPS. GitHub Pages uses HTTPS by default.');
       return;
     }
+    const canvas = await captureReportCanvas(3);
     if (!navigator.clipboard || typeof ClipboardItem === 'undefined') {
-      alert('Clipboard image copy is not supported in this browser.');
+      downloadCanvasPng(canvas);
+      alert('Clipboard image copy is not supported in this browser. Downloaded PNG instead.');
       return;
     }
 
-    const canvas = await captureReportCanvas(3);
     const blob = await canvasToBlob(canvas, 'image/png');
     if (!blob) {
       alert('Unable to create report image.');
