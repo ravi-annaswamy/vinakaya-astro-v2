@@ -236,6 +236,95 @@
   flex-wrap: wrap;
   gap: 20px;
 }
+.dasha-summary-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 8px;
+  margin: 4px 0 12px;
+}
+.dasha-summary-item {
+  border: 1px solid #dddddd;
+  background: #f7f7f7;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 13px;
+  line-height: 1.3;
+}
+.dasha-summary-item span {
+  font-weight: 700;
+}
+.dasha-summary-item-wide {
+  grid-column: span 2;
+}
+.dasha-sequence-wrap {
+  grid-column: span 2;
+  margin-top: 6px;
+}
+.dasha-sequence-track {
+  position: relative;
+  display: flex;
+  height: 34px;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  overflow: visible;
+  background: #ffffff;
+}
+.dasha-segment {
+  min-width: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1f1f1f;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  line-height: 1.05;
+}
+.dasha-segment-lord {
+  padding: 0 4px;
+}
+.dasha-segment-years {
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+.dasha-marker {
+  position: absolute;
+  top: -7px;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid #111111;
+  z-index: 8;
+}
+.dasha-marker span {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 700;
+  color: #111111;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 0 3px;
+  border-radius: 3px;
+  line-height: 1.2;
+}
+.dasha-marker-birth span {
+  transform: none;
+  left: 4px;
+}
+.dasha-marker-now {
+  border-top-color: #0b7a0b;
+}
+.dasha-marker-now span {
+  color: #0b7a0b;
+}
 .dasha-container .dasha-item {
   flex: 1 1 260px;
 }
@@ -411,6 +500,35 @@
 
   .dasha-container {
     gap: 8px;
+  }
+
+  .dasha-summary-panel {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .dasha-summary-item,
+  .dasha-summary-item-wide {
+    grid-column: span 1;
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+
+  .dasha-sequence-wrap {
+    grid-column: span 1;
+  }
+
+  .dasha-sequence-track {
+    height: 28px;
+  }
+
+  .dasha-segment {
+    font-size: 9px;
+  }
+
+  .dasha-segment-years {
+    font-size: 8px;
   }
 
   .dasha-container .dasha-item {

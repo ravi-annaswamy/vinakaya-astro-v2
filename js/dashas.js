@@ -93,6 +93,129 @@ function findCurrentDashaIndex(dashas, offsetNow) {
   return -1;
 }
 
+function jdToUtcDate(jd) {
+  return new Date((jd - 2440587.5) * 86400000);
+}
+
+function diffYMD(fromDate, toDate) {
+  let years = toDate.getUTCFullYear() - fromDate.getUTCFullYear();
+  let months = toDate.getUTCMonth() - fromDate.getUTCMonth();
+  let days = toDate.getUTCDate() - fromDate.getUTCDate();
+
+  if (days < 0) {
+    months -= 1;
+    const prevMonthLastDay = new Date(Date.UTC(
+      toDate.getUTCFullYear(),
+      toDate.getUTCMonth(),
+      0
+    )).getUTCDate();
+    days += prevMonthLastDay;
+  }
+
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  return { years, months, days };
+}
+
+function formatTamilAge(ymd) {
+  return `${ymd.years} வரு. ${ymd.months} மா. ${ymd.days} நாள்`;
+}
+
+function formatYMDHyphen(ymd) {
+  return `${ymd.years}-${ymd.months}-${ymd.days}`;
+}
+
+function getDashaEndOffset(dasha) {
+  if (dasha.endOffset !== null) return dasha.endOffset;
+  return dasha.startOffset + (dashyr[dasha.lordIndex] * 365.25);
+}
+
+function makeDashaTimelineStrip(dashas, offsetNow) {
+  const segments = [];
+  let totalEnd = 0;
+  const palette = ['#f8a5a5', '#f8c291', '#f6e58d', '#badc58', '#7ed6df', '#74b9ff', '#a29bfe', '#fd79a8', '#b2bec3'];
+
+  for (let i = 0; i < dashas.length; i++) {
+    const dasha = dashas[i];
+    const segmentStart = Math.max(0, dasha.startOffset);
+    const segmentEnd = getDashaEndOffset(dasha);
+    if (segmentEnd <= 0 || segmentEnd <= segmentStart) continue;
+
+    segments.push({
+      lord: dasha.lord,
+      start: segmentStart,
+      end: segmentEnd,
+      color: palette[dasha.lordIndex % palette.length]
+    });
+    totalEnd = Math.max(totalEnd, segmentEnd);
+  }
+
+  if (segments.length === 0 || totalEnd <= 0) return '';
+
+  const currentOffset = Math.max(0, Math.min(offsetNow, totalEnd));
+  const currentPct = (currentOffset / totalEnd) * 100;
+
+  const segmentHtml = segments.map(seg => {
+    const widthPct = ((seg.end - seg.start) / totalEnd) * 100;
+    const cumulativeYears = Math.floor(seg.end / 365.25);
+    return `<div class="dasha-segment" style="width:${widthPct}%; background:${seg.color};">
+      <span class="dasha-segment-lord">${seg.lord}</span>
+      <span class="dasha-segment-years">${cumulativeYears}</span>
+    </div>`;
+  }).join('');
+
+  return `<div class="dasha-sequence-wrap">
+    <div class="dasha-sequence-track">
+      ${segmentHtml}
+      <div class="dasha-marker dasha-marker-birth" style="left:0%;"><span>பிறப்பு</span></div>
+      <div class="dasha-marker dasha-marker-now" style="left:${currentPct}%;"><span>இன்று</span></div>
+    </div>
+  </div>`;
+}
+
+function makeDashaSummaryPanel(dashas, birthJD, offsetNow) {
+  const currDashaIdx = findCurrentDashaIndex(dashas, offsetNow);
+  const birthDate = jdToUtcDate(birthJD);
+  const nowDate = jdToUtcDate(birthJD + offsetNow);
+  const currentAge = formatTamilAge(diffYMD(birthDate, nowDate));
+
+  const natalDasha = dashas[0];
+  const natalEndJD = birthJD + natalDasha.endOffset;
+  const natalBalance = formatYMDHyphen(diffYMD(birthDate, jdToUtcDate(natalEndJD)));
+  const natalBalanceText = `${natalDasha.lord} தசை ${natalBalance}`;
+
+  let currentDashaBhuktiText = 'தற்போதைய தசை/புக்தி ஏதுமில்லை';
+
+  if (currDashaIdx >= 0) {
+    const currentDasha = dashas[currDashaIdx];
+    const currentDashaEnd = (currentDasha.endOffset !== null)
+      ? jul2dateDDMMYYYY(birthJD + currentDasha.endOffset)
+      : '—';
+    currentDashaBhuktiText = `${currentDasha.lord} தசை ${currentDashaEnd} வரை.`;
+
+    const currBhuktiIdx = currentDasha.subLords.findIndex(
+      sub => offsetNow >= sub.startOffset && offsetNow < sub.endOffset
+    );
+    if (currBhuktiIdx >= 0) {
+      const currentBhukti = currentDasha.subLords[currBhuktiIdx];
+      const currentBhuktiEnd = jul2dateDDMMYYYY(birthJD + currentBhukti.endOffset);
+      currentDashaBhuktiText += ` ${currentBhukti.lord} புக்தி ${currentBhuktiEnd} வரை.`;
+    }
+  }
+
+  const timelineStrip = makeDashaTimelineStrip(dashas, offsetNow);
+
+  return `<div class="dasha-summary-panel">
+    <div class="dasha-summary-item"><span>பிறப்பு தசை இருப்பு:</span> ${natalBalanceText}</div>
+    <div class="dasha-summary-item"><span>நடப்பு வயது:</span> ${currentAge}</div>
+    <div class="dasha-summary-item dasha-summary-item-wide"><span>நடப்பு தசாபுக்தி:</span> ${currentDashaBhuktiText}</div>
+    ${timelineStrip}
+  </div>`;
+}
+
 // Build a data structure of dashas + sub-lords from the dlist array
 function buildDashaData(birthJD, natalDashaIndex) {
   const dashas = [];
@@ -134,6 +257,7 @@ function buildDashaData(birthJD, natalDashaIndex) {
 
     dashas.push({
       lord: dlnamtam[mLordIndex],
+      lordIndex: mLordIndex,
       startOffset,
       endOffset,
       subLords
@@ -148,6 +272,7 @@ function buildDashaData(birthJD, natalDashaIndex) {
  */
 function makeDashaTables(dashas, birthJD, offsetNow) {
   const currDashaIdx = findCurrentDashaIndex(dashas, offsetNow);
+  const summaryPanel = makeDashaSummaryPanel(dashas, birthJD, offsetNow);
 
   let dashaTable = `<h4>தசை வரிசை</h4><table><thead><tr><th>மஹாதசை</th><th>தொடக்கம்</th><th>முடிவு</th></tr></thead><tbody>`;
 
@@ -213,6 +338,7 @@ function makeDashaTables(dashas, birthJD, offsetNow) {
 
   // Return explicitly Dasha-Bhukti-Antara side-by-side
   return `
+  ${summaryPanel}
   <div class="dasha-container">
     <div class="dasha-item">${dashaTable}</div>
     <div class="dasha-item">${bhuktiTable}</div>
