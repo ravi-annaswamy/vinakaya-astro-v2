@@ -67,6 +67,20 @@ function getCityInfo(cityName) {
       timezoneName: 'Asia/Kolkata',
       dst: false
     },
+    'Karaikudi': {
+      latitude: { degrees: 10, minutes: 4, direction: 'N' },
+      longitude: { degrees: 78, minutes: 47, direction: 'E' },
+      timezone: { hours: 5, minutes: 30, direction: 'E' },
+      timezoneName: 'Asia/Kolkata',
+      dst: false
+    },
+    'Ramanathapuram': {
+      latitude: { degrees: 9, minutes: 23, direction: 'N' },
+      longitude: { degrees: 78, minutes: 50, direction: 'E' },
+      timezone: { hours: 5, minutes: 30, direction: 'E' },
+      timezoneName: 'Asia/Kolkata',
+      dst: false
+    },
     'Hyderabad': {
       latitude: { degrees: 17, minutes: 23, direction: 'N' },
       longitude: { degrees: 78, minutes: 27, direction: 'E' },
@@ -158,6 +172,13 @@ function getCityInfo(cityName) {
       timezoneName: 'Asia/Kolkata',
       dst: false
     },
+    'Colombo': {
+      latitude: { degrees: 6, minutes: 56, direction: 'N' },
+      longitude: { degrees: 79, minutes: 51, direction: 'E' },
+      timezone: { hours: 5, minutes: 30, direction: 'E' },
+      timezoneName: 'Asia/Colombo',
+      dst: false
+    },
     'Dubai': {
       latitude: { degrees: 25, minutes: 16, direction: 'N' },
       longitude: { degrees: 55, minutes: 18, direction: 'E' },
@@ -186,13 +207,6 @@ function getCityInfo(cityName) {
       timezoneName: 'Australia/Sydney',
       dst: true
     },
-    'Karaikudi': {
-      latitude: { degrees: 10, minutes: 4, direction: 'N' },
-      longitude: { degrees: 78, minutes: 47, direction: 'E' },
-      timezone: { hours: 5, minutes: 30, direction: 'E' },
-      timezoneName: 'Asia/Kolkata',
-      dst: false
-    },
     'Riyadh, Saudi Arabia': {
       latitude: { degrees: 24, minutes: 43, direction: 'N' },
       longitude: { degrees: 46, minutes: 43, direction: 'E' },
@@ -202,13 +216,20 @@ function getCityInfo(cityName) {
     }
   };
 
-  return cityData[cityName] || null;
+  const cityAliases = {
+    'Karaikkudi': 'Karaikudi'
+  };
+
+  const normalizedCityName = cityAliases[cityName] || cityName;
+  return cityData[normalizedCityName] || null;
 }
 
 const cityTamilNames = {
   'Chennai': 'சென்னை',
   'Tiruchirappalli': 'திருச்சிராப்பள்ளி',
   'Madurai': 'மதுரை',
+  'Karaikudi': 'காரைக்குடி',
+  'Ramanathapuram': 'ராமனாதபுரம்',
   'Vellore': 'வேலூர்',
   'Salem': 'சேலம்',
   'Coimbatore': 'கோயம்புத்தூர்',
@@ -221,6 +242,7 @@ const cityTamilNames = {
   'New Delhi': 'புதுதில்லி',
   'Mumbai': 'மும்பை',
   'Kolkata': 'கொல்கத்தா',
+  'Colombo': 'கொழும்பு',
   'London': 'லண்டன்',
   'New York, NY': 'நியூயார்க்',
   'Westlake, OH': 'வெஸ்ட்லேக்',
@@ -232,7 +254,7 @@ const cityTamilNames = {
   'Cairo': 'கெய்ரோ',
   'Melbourne': 'மெல்போர்ன்',
   'Sydney': 'சிட்னி',
-  'Karaikudi': 'காரைக்குடி',
+  'Karaikkudi': 'காரைக்குடி',
   'Riyadh, Saudi Arabia': 'ரியாத்'
 };
 
