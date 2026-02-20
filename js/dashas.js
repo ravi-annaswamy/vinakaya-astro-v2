@@ -184,8 +184,8 @@ function makeDashaSummaryPanel(dashas, birthJD, offsetNow) {
 
   const natalDasha = dashas[0];
   const natalEndJD = birthJD + natalDasha.endOffset;
-  const natalBalance = formatYMDHyphen(diffYMD(birthDate, jdToUtcDate(natalEndJD)));
-  const natalBalanceText = `${natalDasha.lord} தசை ${natalBalance}`;
+  const natalBalanceYMD = diffYMD(birthDate, jdToUtcDate(natalEndJD));
+  const natalBalanceText = `${natalDasha.lord} தசை ${formatTamilAge(natalBalanceYMD)}`;
 
   let currentDashaBhuktiText = 'தற்போதைய தசை/புக்தி ஏதுமில்லை';
 

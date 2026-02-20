@@ -287,7 +287,7 @@
 }
 .dasha-segment-years {
   padding: 0 4px;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
   opacity: 0.9;
 }
@@ -528,7 +528,7 @@
   }
 
   .dasha-segment-years {
-    font-size: 8px;
+    font-size: 11px;
   }
 
   .dasha-container .dasha-item {
@@ -801,33 +801,67 @@ function downloadCanvasPng(canvas) {
   link.click();
 }
 
+let copyToastTimer = null;
+function showCopyToast(message, isError = false, durationMs = 2200) {
+  let toast = document.getElementById('copyReportToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'copyReportToast';
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.right = '20px';
+    toast.style.maxWidth = '380px';
+    toast.style.padding = '10px 14px';
+    toast.style.borderRadius = '8px';
+    toast.style.boxShadow = '0 6px 20px rgba(0,0,0,0.25)';
+    toast.style.fontSize = '14px';
+    toast.style.lineHeight = '1.35';
+    toast.style.zIndex = '99999';
+    toast.style.transition = 'opacity 180ms ease';
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = message;
+  toast.style.background = isError ? '#b00020' : '#1f7a1f';
+  toast.style.color = '#ffffff';
+  toast.style.opacity = '1';
+
+  if (copyToastTimer) clearTimeout(copyToastTimer);
+  copyToastTimer = setTimeout(() => {
+    toast.style.opacity = '0';
+  }, durationMs);
+}
+
 async function copyReportToClipboard() {
   try {
-    if (!ensureExportDependencies()) return;
+    if (typeof html2canvas === 'undefined') {
+      showCopyToast('html2canvas failed to load. Check internet access and reload.', true, 3000);
+      return;
+    }
     if (!window.isSecureContext) {
-      alert('Copy requires HTTPS. GitHub Pages uses HTTPS by default.');
+      showCopyToast('Copy requires HTTPS. GitHub Pages uses HTTPS by default.', true, 3000);
       return;
     }
     const canvas = await captureReportCanvas(3);
     if (!navigator.clipboard || typeof ClipboardItem === 'undefined') {
       downloadCanvasPng(canvas);
-      alert('Clipboard image copy is not supported in this browser. Downloaded PNG instead.');
+      showCopyToast('Clipboard image copy is not supported. Downloaded PNG instead.', false, 3000);
       return;
     }
 
     const blob = await canvasToBlob(canvas, 'image/png');
     if (!blob) {
-      alert('Unable to create report image.');
+      showCopyToast('Unable to create report image.', true, 3000);
       return;
     }
 
     await navigator.clipboard.write([
       new ClipboardItem({ 'image/png': blob })
     ]);
-    alert('Report copied to clipboard as image.');
+    showCopyToast('Report copied to clipboard as image.');
   } catch (err) {
     console.error(err);
-    alert('Failed to copy report. Please try again.');
+    showCopyToast('Failed to copy report. Please try again.', true, 3000);
   }
 }
 
